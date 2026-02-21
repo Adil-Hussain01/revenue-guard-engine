@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenue Guard | Detection & Validation Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0f0f13;
+            --bg-card: #1e1e2e;
+            --text-primary: #cdd6f4;
+            --text-secondary: #9399b2;
+            --accent-safe: #2ecc71;
+            --accent-monitor: #f1c40f;
+            --accent-critical: #e74c3c;
+            --border: #313244;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 2rem 5%;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: white;
+        }
+
+        .header-status {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .container {
+            padding: 2rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .kpi-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .kpi-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .kpi-trend {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .chart-box h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .chart-box img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        /* Table Section */
+        .table-section {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 1rem 1.5rem;
+            background-color: rgba(255,255,255,0.03);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 1.2rem 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-critical { background-color: rgba(231, 76, 60, 0.15); color: var(--accent-critical); }
+        .badge-monitor { background-color: rgba(241, 196, 15, 0.15); color: var(--accent-monitor); }
+        .badge-safe { background-color: rgba(46, 204, 113, 0.15); color: var(--accent-safe); }
+
+        .btn-refresh {
+            background-color: #5865f2;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+
+        .btn-refresh:hover {
+            filter: brightness(1.2);
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">
+            <h1>Revenue Guard</h1>
+            <div class="header-status">
+                Leakage Detection & Validation Engine • Live Report
+            </div>
+        </div>
+        <div>
+            <button class="btn-refresh" onclick="refreshData()">Sync Engine</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Scan Coverage</div>
+                <div class="kpi-value">{{ stats.total_validated }}</div>
+                <div class="kpi-trend" style="color: var(--text-secondary)">Total Transactions</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Health Pass Rate</div>
+                <div class="kpi-value">{{ "%.1f"|format(stats.safe_count / stats.total_validated * 100 if stats.total_validated else 0) }}%</div>
+                <div class="kpi-trend" style="color: var(--accent-safe)">{{ stats.safe_count }} Safe Orders</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Avg Risk Score</div>
+                <div class="kpi-value">{{ stats.average_risk_score }}</div>
+                <div class="kpi-trend" style="color: var(--accent-monitor)">System Weighted Avg</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Critical Alerts</div>
+                <div class="kpi-value" style="color: var(--accent-critical)">{{ stats.critical_count }}</div>
+                <div class="kpi-trend">Requires Immediate Action</div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <div class="chart-box">
+                <h3>Risk Distribution Histogram</h3>
+                <img src="/static/charts/risk_distribution.png?v={{ request.query_params.v or '1' }}" alt="Risk Distribution">
+            </div>
+            <div class="chart-box">
+                <h3>Validation Outcomes</h3>
+                <img src="/static/charts/validation_breakdown.png?v={{ request.query_params.v or '1' }}" alt="Validation Breakdown">
+            </div>
+            <div class="chart-box">
+                <h3>Revenue Leakage Prevention Gain</h3>
+                <img src="/static/charts/prevention_metrics.png?v={{ request.query_params.v or '1' }}" alt="Prevention Metrics">
+            </div>
+            <div class="chart-box">
+                <h3>Top Anomaly Categories</h3>
+                <img src="/static/charts/leakage_categories.png?v={{ request.query_params.v or '1' }}" alt="Leakage Categories">
+            </div>
+            <div class="chart-box full-width">
+                <h3>Average Transaction Risk Over Time</h3>
+                <img src="/static/charts/risk_trend.png?v={{ request.query_params.v or '1' }}" alt="Risk Trend">
+            </div>
+        </div>
+
+        <!-- High-Risk Table -->
+        <div class="table-section">
+            <div class="table-header">
+                <h2 style="margin: 0; font-size: 1.2rem;">Hotlist: Critical Vulnerabilities</h2>
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">Last scan: {{ last_scan }}</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Risk Score</th>
+                        <th>Violations</th>
+                        <th>Classification</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in high_risk %}
+                    <tr>
+                        <td style="font-family: monospace; font-weight: 500;">{{ item.order_id }}</td>
+                        <td style="font-weight: 700;">{{ item.risk_score }} / 100</td>
+                        <td>{{ item.rules_failed + item.rules_warned }} Rules triggered</td>
+                        <td><span class="status-badge badge-{{ item.risk_classification }}">{{ item.risk_classification }}</span></td>
+                        <td><a href="#" style="color: #5865f2; text-decoration: none; font-size: 0.85rem; font-weight: 600;">View Audit Log</a></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-secondary);">No critical orders found. System is healthy.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Antigravity Revenue Guard • Developed for Advanced Agentic Coding
+    </footer>
+
+    <script>
+        async function refreshData() {
+            const btn = document.querySelector('.btn-refresh');
+            const originalText = btn.innerText;
+            btn.innerText = 'Syncing...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/refresh', { method: 'POST' });
+                if (response.ok) {
+                    location.href = '/?v=' + Date.now();
+                } else {
+                    alert('Failed to refresh data.');
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Connection error.');
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
