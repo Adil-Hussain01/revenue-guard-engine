@@ -14,7 +14,7 @@ from backend.api.crm_models import (
 from backend.api.crm_store import CRMStore, CRMException
 from backend.api.crm_business_rules import validate_deal_stage_progression, validate_order_discount
 
-router = APIRouter(prefix="/api/v1/crm", tags=["CRM Simulator"])
+router = APIRouter(prefix="/api/v1/crm", tags=["GoHighLevel Connector"])
 
 # Global store initialized on app startup
 _store = CRMStore()

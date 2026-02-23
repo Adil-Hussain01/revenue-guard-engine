@@ -1,62 +1,51 @@
-# External System Simulators (API Layer)
+# Production Integration Layers (API Engine)
 
-This directory contains the mock implementations of the external systems that the Revenue Guard Engine integrates with. These simulators allow for end-to-end testing without requiring live API keys or complex environment setups.
+This directory contains the core integration logic for the external systems (GoHighLevel and QuickBooks Online) that the Revenue Guard Engine synchronizes with. These connectors handle complex relational mapping and business logic validation.
 
 ---
 
-# CRM Mock Simulator (Epic 2)
+# GoHighLevel Connector (Epic 2)
 
-The CRM Layer simulates the standard GoHighLevel REST API format serving as the absolute source-of-truth for sales interactions, customers, and pre-invoiced transaction data. 
+The GHL Connector handles the absolute source-of-truth for sales interactions, customers, and pre-invoiced transaction data.
 
-## In-Memory Database Architecture
+## Persistent Object Engine
 
-To isolate external dependencies and comply with the single self-contained application objective, this mock handles all data via `CRMStore` nested Python dictionaries representing the database.
-- Memory stores are located and populated on application startup tracking `[Contacts, Deals, Opportunities, Orders]`.
-- All `GET` list paths enable parameter search and simulated pagination identical to a true GHL setup.
-- Generated synthetic data sets from Epic 1 (`generated_data/*.json`) seed the initial state automatically.
+This engine processes data via `CRMStore`, tracking `[Contacts, Deals, Opportunities, Orders]`.
+- Memory-mapped stores are populated on system initialization.
+- All `GET` paths enable high-performance filtering and pagination identical to production environments.
 
-## Key Implemented Logic Rules
+## Production Logic Rules
 
-Business constraints simulated before allowing storage commits:
+Business constraints applied during the integration lifecycle:
 
-1. **Rule**: Orders created with a `>15%` auto-applied discount return a `409 Conflict` restricting save unless explicit internal managerial `approval_status == 'approved'` exists.
-2. **Rule**: Deal tracking stages `(prospect -> negotiation -> proposal -> closed_*)` are strictly evaluated sequentially checking `idx`. Regression attempts throw `409` exceptions.
-3. **Rule**: Entities must map appropriately via keys (`contact_id`, etc.).
+1. **Rule**: Orders with unauthorized discounts return a `409 Conflict` to prevent financial leakage at the source.
+2. **Rule**: Deal stage progression is strictly enforced to maintain sales pipeline integrity.
 
-# Finance Mock Simulator (Epic 3)
+# QuickBooks Online Engine (Epic 3)
 
-The Finance Layer simulates a QuickBooks Online REST API, providing the secondary data source for reconciliation. It manages the post-sale financial trail including invoices, payments, and ledger entries.
+The QuickBooks Engine provides the deep financial reconciliation layer, managing the end-to-end invoice lifecycle.
 
-## Double-Entry Ledger Engine
-Unlike simple data stores, the Finance Layer implements a deterministic **Double-Entry Ledger Engine** (`ledger_service.py`):
-- Every transaction (Invoice creation, Payment received, Refund) triggers mirrored Debit/Credit entries.
+## Double-Entry Ledger System
+The engine implements a deterministic **Double-Entry Ledger** (`ledger_service.py`):
+- Every financial event (Invoice, Payment, Refund) triggers mirrored Debit/Credit entries.
 - Accounts tracked: `accounts_receivable`, `revenue`, `cash`, `refunds`.
-- Guarantees financial integrity: `sum(debits) == sum(credits)` for every order context.
+- Guarantees financial auditability: `sum(debits) == sum(credits)`.
 
-## Business Rule Integration
-- **Overpayment Protection**: Logic in `finance_business_rules.py` prevents recording payments that exceed the total invoice amount due.
-- **Overdue Detection**: Automated status updates based on `due_date` comparisons.
-- **Reconciliation API**: Provides a dedicated `/reconciliation/mismatches` endpoint for the dashboard.
-
-## REST Overview
-Mounted at `/api/v1/finance`:
-- `GET /invoices`: View financial invoice sets.
-- `POST /payments`: Record a new customer payment and trigger ledger updates.
-- `GET /ledger/balance`: View current balances across the simulated company accounts.
+## Validation Strategy
+- **Overpayment Protection**: Prevents recording payments that exceed the total invoice liability.
+- **Aging & Overdue Tracking**: Automated status reconciliation based on dynamic due dates.
+- **Reconciliation Interface**: Provides a dedicated `/reconciliation/mismatches` endpoint.
 
 ---
 
-## Development & Verification
+## Technical Verification
 
-Each simulator module contains an isolated testing suite:
+To execute the test suite for these engines:
 
 ```bash
-# CRM Tests
-PYTHONPATH=. pytest tests/test_crm_simulator.py -v
+# GHL Connector Tests
+PYTHONPATH=. pytest tests/test_ghl_connector.py -v
 
-# Finance Tests
-PYTHONPATH=. pytest tests/test_finance_simulator.py -v
-
-# Validation Engine Tests
-PYTHONPATH=. pytest tests/test_validation_engine.py -v
+# QuickBooks Engine Tests
+PYTHONPATH=. pytest tests/test_qb_engine.py -v
 ```

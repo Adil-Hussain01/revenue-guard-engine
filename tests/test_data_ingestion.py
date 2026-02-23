@@ -1,11 +1,11 @@
 import pytest
 from datetime import datetime, timedelta
 
-from backend.data.synthetic_data_generator import SyntheticDataGenerator
+from backend.data.data_ingestor import DataIngestor
 from backend.data.config import GENERATOR_CONFIG
 
 def test_volume_and_entity_integrity():
-    generator = SyntheticDataGenerator()
+    generator = DataIngestor()
     dataset = generator.generate()
 
     assert len(dataset.orders) == GENERATOR_CONFIG["num_transactions"]
@@ -19,7 +19,7 @@ def test_volume_and_entity_integrity():
 def test_anomaly_rates():
     config = GENERATOR_CONFIG.copy()
     config["num_transactions"] = 2000 # larger sample for better rate accuracy
-    generator = SyntheticDataGenerator(config=config)
+    generator = DataIngestor(config=config)
     dataset = generator.generate()
     
     total = len(dataset.orders)
@@ -35,17 +35,17 @@ def test_anomaly_rates():
     assert drift_count == expected_drift
 
 def test_determinism():
-    gen1 = SyntheticDataGenerator()
+    gen1 = DataIngestor()
     ds1 = gen1.generate()
     
-    gen2 = SyntheticDataGenerator()
+    gen2 = DataIngestor()
     ds2 = gen2.generate()
     
     assert ds1.orders[0].order_id == ds2.orders[0].order_id
     assert ds1.orders[0].total_amount == ds2.orders[0].total_amount
 
 def test_date_ranges():
-    generator = SyntheticDataGenerator()
+    generator = DataIngestor()
     dataset = generator.generate()
     
     total_months = GENERATOR_CONFIG["date_range_months"]

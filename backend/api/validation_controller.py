@@ -9,9 +9,9 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
 
 from backend.api.crm_store import CRMStore
-from backend.api.crm_simulator import get_store as get_crm_store
+from backend.api.ghl_connector import get_store as get_crm_store
 from backend.api.finance_store import FinanceStore
-from backend.api.finance_simulator import get_store as get_finance_store
+from backend.api.qb_engine import get_store as get_finance_store
 from backend.core.audit_logger import AuditLogger
 from backend.core.audit_store import AuditStore
 from backend.core.reconciliation_engine import ReconciliationEngine

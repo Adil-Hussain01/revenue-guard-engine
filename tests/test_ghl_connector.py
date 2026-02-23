@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from datetime import datetime, timezone
 
 from backend.main import app
-from backend.api.crm_simulator import get_store
+from backend.api.ghl_connector import get_store
 from backend.api.crm_store import CRMStore
 from backend.api.crm_models import Contact, Deal, Opportunity, Order, LineItem
 from decimal import Decimal

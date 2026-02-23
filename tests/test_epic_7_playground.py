@@ -35,8 +35,8 @@ def test_redoc_loads():
 def test_system_reset():
     """POST /api/v1/system/reset -> 200"""
     # 1. Add some mock data to stores manually
-    from backend.api.crm_simulator import get_store as get_crm_store
-    from backend.api.finance_simulator import get_store as get_finance_store
+    from backend.api.ghl_connector import get_store as get_crm_store
+    from backend.api.qb_engine import get_store as get_finance_store
     from backend.api.crm_models import Contact
     from datetime import datetime, timezone
     

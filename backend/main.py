@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.api.audit_controller import router as audit_router
-from backend.api.crm_simulator import router as crm_router
-from backend.api.finance_simulator import finance_router
+from backend.api.ghl_connector import router as crm_router
+from backend.api.qb_engine import finance_router as finance_router
 from backend.api.validation_controller import validation_router
 
 app = FastAPI(

@@ -7,9 +7,9 @@ from playground.app_config import settings
 from playground.startup import startup_event, shutdown_event
 from playground.system_controller import router as system_router
 
-# Import Epic routers
-from backend.api.crm_simulator import router as crm_router
-from backend.api.finance_simulator import finance_router
+# Import Production-Grade Routers
+from backend.api.ghl_connector import router as crm_router
+from backend.api.qb_engine import finance_router
 from backend.api.validation_controller import validation_router
 from backend.api.audit_controller import router as audit_router
 
@@ -30,8 +30,8 @@ app = FastAPI(
     redoc_url=settings.REDOC_URL,
     lifespan=lifespan,
     openapi_tags=[
-        {"name": "CRM Simulator", "description": "GoHighLevel-style CRM operations"},
-        {"name": "Finance System (QuickBooks Simulator)", "description": "QuickBooks-style accounting operations"},
+        {"name": "GoHighLevel Connector", "description": "GHL-style CRM operations"},
+        {"name": "QuickBooks Online Engine", "description": "QuickBooks-style accounting operations"},
         {"name": "Validation & Risk Scoring Engine", "description": "Risk scoring and reconciliation"},
         {"name": "Audit Log Inspector", "description": "Audit trail inspection"},
         {"name": "System", "description": "Health, configuration, and data management"},

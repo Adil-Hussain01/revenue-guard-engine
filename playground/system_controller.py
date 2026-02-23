@@ -3,9 +3,9 @@ System Controller
 """
 from fastapi import APIRouter, BackgroundTasks
 from playground.app_config import settings
-from backend.api.crm_simulator import get_store as get_crm_store
-from backend.api.finance_simulator import get_store as get_finance_store
-from backend.data.synthetic_data_generator import SyntheticDataGenerator
+from backend.api.ghl_connector import get_store as get_crm_store
+from backend.api.qb_engine import get_store as get_finance_store
+from backend.data.data_ingestor import DataIngestor
 import time
 
 router = APIRouter(prefix="/system", tags=["System"])
@@ -41,13 +41,13 @@ async def reset_data():
 @router.post("/seed")
 async def reseed_data(background_tasks: BackgroundTasks):
     """
-    Trigger a fresh synthetic data generation and reload stores.
+    Trigger a fresh data ingestion and reload stores.
     This is an expensive operation and is run in the background.
     """
     def generate_and_reload():
-        generator = SyntheticDataGenerator()
-        dataset = generator.generate()
-        generator.save(dataset, output_dir=settings.DATA_DIR)
+        ingestor = DataIngestor()
+        dataset = ingestor.generate()
+        ingestor.save(dataset, output_dir=settings.DATA_DIR)
         
         crm_store = get_crm_store()
         finance_store = get_finance_store()

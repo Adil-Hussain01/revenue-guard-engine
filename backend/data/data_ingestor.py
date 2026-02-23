@@ -14,8 +14,8 @@ from .models import (
 from .config import GENERATOR_CONFIG
 from .anomaly_injector import AnomalyInjector
 
-class SyntheticDataGenerator:
-    """Orchestrates end-to-end dataset generation."""
+class DataIngestor:
+    """Orchestrates end-to-end dataset ingestion."""
 
     def __init__(self, config: Dict[str, Any] = None):
         """

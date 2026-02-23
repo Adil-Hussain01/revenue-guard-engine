@@ -18,8 +18,8 @@ from backend.api.crm_store import CRMStore
 from backend.api.crm_models import Order, LineItem
 from backend.api.finance_store import FinanceStore
 from backend.api.finance_models import Invoice
-from backend.api.crm_simulator import get_store as get_crm_store
-from backend.api.finance_simulator import get_store as get_finance_store
+from backend.api.ghl_connector import get_store as get_crm_store
+from backend.api.qb_engine import get_store as get_finance_store
 from backend.api.validation_controller import get_engine, reset_engine
 from backend.core.reconciliation_engine import ReconciliationEngine
 from backend.core.validation_models import ValidationContext, RuleViolation

@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 
 from backend.main import app
 from backend.api.finance_store import FinanceStore
-from backend.api.finance_simulator import get_store, get_rules, get_ledger
+from backend.api.qb_engine import get_store, get_rules, get_ledger
 from backend.api.finance_models import Invoice, Payment
 from backend.api.ledger_service import LedgerService
 from backend.api.finance_business_rules import FinanceBusinessRules

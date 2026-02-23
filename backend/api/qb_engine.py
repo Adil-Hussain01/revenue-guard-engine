@@ -13,7 +13,7 @@ from backend.api.finance_store import FinanceStore
 from backend.api.ledger_service import LedgerService
 from backend.api.finance_business_rules import FinanceBusinessRules
 
-finance_router = APIRouter(prefix="/api/v1/finance", tags=["Finance System (QuickBooks Simulator)"])
+finance_router = APIRouter(prefix="/api/v1/finance", tags=["QuickBooks Online Engine"])
 
 # ---------------------------------------------------------
 # Dependency Injection / Global State Mock
